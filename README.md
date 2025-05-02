@@ -55,7 +55,7 @@ This architecture enables seamless flow from image input to personalized dietary
 ## 📂 Project Structure
 
 ```
-DIABETESMEALANALYSISCNNETS/
+DiabEats/
 ├── code/
 │   ├── 00_download_food101_dataset.ipynb
 │   ├── 01_prepare_food101_dataset.ipynb
