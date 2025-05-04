@@ -389,14 +389,9 @@ def predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names
         nutrients = get_nutritional_profile(top_food, df_avg)
 
         if nutrients is None:
-            if formatted_food.lower() == "grilled cheese sandwich":
-                risk_level = "High"
-                risk_score = 3.0
-                risk_factors = [{'name': 'Refined Carbs', 'score': 2.0}, {'name': 'Added Sugar', 'score': 2.0}]
-            else:
-                risk_level = "Unknown"
-                risk_score = 0.0
-                risk_factors = []
+            risk_level = "Unknown"
+            risk_score = 0.0
+            risk_factors = []
         else:
             risk_level, risk_score, risk_factors = assess_diabetes_risk(nutrients, portion_size)
 
@@ -427,8 +422,9 @@ def predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names
         show_top_predicted_food_class(formatted_food, portion_size, top_confidence, img_preview, idx, image_name)
 
         st.markdown(f"<h3>Nutrition Content of {formatted_food}</h3>", unsafe_allow_html=True)
+        folder_name = "Downloads"  # Assuming files are from Downloads; adjust if dynamic folder detection is needed
         portion_column_label = (
-            f"Portion Size (g) for {top_food}/{image_name}"
+            f"Portion Size (g) for {folder_name}/{image_name}"
             if uploaded_files and idx < len(uploaded_files)
             else "Portion Size (g)"
         )
@@ -514,13 +510,13 @@ def predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names
             )
 
         st.markdown("<h3>Recommendations for Diabetes Management</h3>", unsafe_allow_html=True)
-        rec_food = "Beef Tartare" if formatted_food.lower().replace(" ", "") == "beeftartare" else formatted_food
+        rec_food = formatted_food
         recommendations = generate_recommendations(rec_food, risk_level, portion_size)
         if recommendations:
             recommendations = [recommendations[0]]
         rec_table = "| No. | Recommendation |\n|-----|---------------|\n"
         for i, rec in enumerate(recommendations, 1):
-            rec_table += f"| {i} | {rec.replace('beef_tartare', 'Beef Tartare').replace('beef tartare', 'Beef Tartare')} |\n"
+            rec_table += f"| {i} | {rec} |\n"
         st.markdown(rec_table)
 
         results.append({
@@ -590,19 +586,10 @@ def main():
         if 'portion_sizes' not in st.session_state:
             st.session_state.portion_sizes = {}
 
-        if uploaded_files and len(st.session_state.predicted_classes) != len(uploaded_files):
-            with st.spinner("Predicting food classes..."):
-                images = [Image.open(file) for file in uploaded_files]
-                st.session_state.predicted_classes = predict_class_names(images, food_model, class_names)
-
         portion_sizes = []
         for i, file in enumerate(uploaded_files):
             image_name = file.name
-            if i < len(st.session_state.predicted_classes):
-                class_name = st.session_state.predicted_classes[i]
-                label = f"Portion size (g) for {class_name}/{image_name}"
-            else:
-                label = f"Portion size (g) for image {i+1}"
+            label = f"Portion size (g) for {image_name}"
             
             if f"portion_{i}" not in st.session_state.portion_sizes:
                 st.session_state.portion_sizes[f"portion_{i}"] = 100
@@ -624,6 +611,8 @@ def main():
         if submit_button and uploaded_files:
             with st.spinner("Analyzing images..."):
                 images = [Image.open(file) for file in uploaded_files]
+                # Perform classification only when Analyze button is clicked
+                st.session_state.predicted_classes = predict_class_names(images, food_model, class_names)
                 results, combined_recommendation = predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names, uploaded_files)
                 
                 if combined_recommendation:
