@@ -572,7 +572,7 @@ def main():
                 📸 Upload Meal Photo(s)
             </div>
             <div class="upload-instructions">
-                <p style="margin-bottom: 0.5rem; text-align: center;">Upload meal photos for instant analysis</p>
+                <p style="margin-bottom: 0.5rem; text-align: center;">Upload meal photo(s) for instant analysis</p>
                 <p style="margin: 0; text-align: center;">Supports JPG, JPEG, and PNG formats</p>
             </div>
         """, unsafe_allow_html=True)
