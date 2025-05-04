@@ -67,21 +67,7 @@ def load_models_and_data():
     df_avg = load_and_process_nutrition_data("./data/food101_nutrition_database.csv")
     if df_avg is None:
         st.error("Failed to load nutritional data. Please check the file path.")
-        return None, None, None, None
-
-    rf_model = None
-    rf_model_path = "./models/rf_model.pkl"
-    if os.path.exists(rf_model_path):
-        try:
-            with open(rf_model_path, "rb") as f:
-                rf_model = pickle.load(f)
-        except Exception as e:
-            st.error(f"Error loading Random Forest model: {e}")
-    else:
-        st.error(
-            f"Random Forest model file not found at {rf_model_path}. "
-            "Please run the training script or check the notebook cell to generate the model."
-        )
+        return None, None, None
 
     food_model = None
     food_model_path = "./models/food_recognition_model.keras"
@@ -110,7 +96,7 @@ def load_models_and_data():
             "Please ensure 'class_names.json' is in the './data/' directory."
         )
 
-    return df_avg, rf_model, food_model, class_names
+    return df_avg, food_model, class_names
 
 def load_and_process_nutrition_data(file_path):
     """Load and normalize nutrition dataset to per 100g."""
@@ -368,6 +354,7 @@ def predict_class_names(images, food_model, class_names):
     return predicted_classes
 
 def img_preview_to_base64(image):
+    """Convert PIL image to base64 string for HTML display."""
     buffered = BytesIO()
     image.save(buffered, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
@@ -382,10 +369,12 @@ def show_top_predicted_food_class(formatted_food, portion_size, top_confidence, 
         f"id='preview-image-{idx}' "
         f"class='preview-image' "
         f"alt='{image_name}' "
-        f"style='width:50px;height:50px;border-radius:8px;'> |"
+        f"onclick='showEnlargedImage(this)' "
+        f"> |"
     )
     st.markdown(table_md, unsafe_allow_html=True)
-def predict_and_recommend(df_avg, rf_model, images, portion_sizes, food_model, class_names, uploaded_files=None):
+
+def predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names, uploaded_files=None):
     """Process images and generate predictions, recommendations, and combined recommendation."""
     results = []
     for idx, (img, portion_size) in enumerate(zip(images, portion_sizes)):
@@ -411,6 +400,7 @@ def predict_and_recommend(df_avg, rf_model, images, portion_sizes, food_model, c
         else:
             risk_level, risk_score, risk_factors = assess_diabetes_risk(nutrients, portion_size)
 
+        # Create visualization
         plt.style.use('dark_background')
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
         ax1.imshow(img_array / 255.0)
@@ -429,27 +419,23 @@ def predict_and_recommend(df_avg, rf_model, images, portion_sizes, food_model, c
         prob_table = "| Food Class | Probability (%) |\n|------------|-----------------|\n"
         for cls, prob in predictions.items():
             formatted_cls = cls.replace('_', ' ').title()
-            prob_table += f"| {formatted_cls} | {prob * 100} |\n"
+            prob_table += f"| {formatted_cls} | {prob * 100:.2f} |\n"
         st.markdown(prob_table)
 
         st.markdown("<h3>Top Predicted Food Class</h3>", unsafe_allow_html=True)
-        img_preview = img.resize((50, 50))  # Use the already-opened img instead of reopening uploaded_files[idx]
-        st.markdown(
-            f"| Food Class | Portion (g) | Confidence | Meal Preview |\n|------------|-------------|------------|-------------|\n"
-            f"| {formatted_food} | {portion_size} | {top_confidence} | <img src='{img_preview_to_base64(img_preview)}' id='preview-image-{idx}' class='preview-image' alt='{image_name}' style='width:50px;height:50px;'> |",
-            unsafe_allow_html=True
-        )
+        img_preview = img.resize((50, 50))
+        show_top_predicted_food_class(formatted_food, portion_size, top_confidence, img_preview, idx, image_name)
 
         st.markdown(f"<h3>Nutrition Content of {formatted_food}</h3>", unsafe_allow_html=True)
         portion_column_label = (
             f"Portion Size (g) for {top_food}/{image_name}"
-            if idx < len(st.session_state.predicted_classes)
+            if uploaded_files and idx < len(uploaded_files)
             else "Portion Size (g)"
         )
         table_data = {
             "Food Class": [formatted_food],
             portion_column_label: [portion_size],
-            "Confidence": [f"{top_confidence}"],
+            "Confidence": [f"{top_confidence:.2f}"],
             "Impact Level": [risk_level],
             "Impact Score": [f"{risk_score:.2f}"],
             "Impact Factors": [", ".join([f["name"] for f in risk_factors]) if risk_factors else "None"]
@@ -460,9 +446,14 @@ def predict_and_recommend(df_avg, rf_model, images, portion_sizes, food_model, c
         st.dataframe(df_table.style.set_properties(**{
             'background-color': '#2C3E50',
             'color': '#ffffff',
-            'border-color': 'rgba(255, 255, 255, 0.1)',
+            'border': '1px solid rgba(255, 255, 255, 0.1)',
             'border-radius': '8px',
-            'padding': '10px'
+            'padding': '0.5rem',
+            'font-size': '16px',
+            'width': '100%',
+            'text-align': 'center',
+            'box-shadow': '0 2px 4px rgba(0,0,0,0.1)',
+            'margin': '1.5rem 0'
         }))
 
         st.markdown(f"<h3>Nutrition Analysis of {formatted_food}</h3>", unsafe_allow_html=True)
@@ -553,25 +544,9 @@ def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-def img_preview_to_base64(image):
-    """Convert PIL image to base64 string for HTML display."""
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    return "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode()
-
-def show_top_predicted_food_class(formatted_food, portion_size, top_confidence, img_preview, idx, image_name):
-    confidence_pct = f"{top_confidence * 100:.1f}%"
-    table_md = (
-        "| Food Class | Portion (g) | Confidence | Meal Preview |\n"
-        "|------------|-------------|------------|--------------|\n"
-        f"| {formatted_food} | {portion_size} | {confidence_pct} | "
-        f"<img src='{img_preview_to_base64(img_preview)}' "
-        f"id='preview-image-{idx}' "
-        f"class='preview-image' "
-        f"alt='{image_name}' "
-        f"style='width:50px;height:50px;border-radius:8px;'> |"
-    )
-    st.markdown(table_md, unsafe_allow_html=True)
+def local_js(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<script>{f.read()}</script>', unsafe_allow_html=True)
 
 def main():
     """
@@ -583,45 +558,27 @@ def main():
     - Results are displayed with nutritional insights and actionable recommendations.
     """
     local_css("static/style.css")
+    local_js("static/script.js")
     create_header()
     about_section()
 
-    df_avg, rf_model, food_model, class_names = load_models_and_data()
+    df_avg, food_model, class_names = load_models_and_data()
     st.session_state['df_avg'] = df_avg
 
     if all([df_avg is not None, food_model is not None, class_names is not None]):
-        # Add global JavaScript for image enlargement
-        st.components.v1.html("""
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.preview-image').forEach(img => {
-                        img.addEventListener('click', function() {
-                            this.classList.toggle('enlarged');
-                        });
-                        img.addEventListener('mouseenter', function() {
-                            this.classList.add('enlarged');
-                        });
-                        img.addEventListener('mouseleave', function() {
-                            this.classList.remove('enlarged');
-                        });
-                    });
-                });
-            </script>
-        """, height=0)
-
-        # Updated sidebar section
+        # Sidebar section
         st.sidebar.markdown("""
-            <div class="upload-image-div">
-                <h3 style="color: var(--text-light); text-align: center;">Upload</h3>
+            <div class="upload-header">
+                📸 Upload Meal Photo(s)
             </div>
-            <div class="upload-instructions" style="color: #e3f2fd; font-size: 0.95rem; text-align: center;">
-                <p style="margin-bottom: 0.5rem;">📸 Upload meal photo(s) for instant analysis</p>
-                <p style="margin: 0;">Supports JPG, PNG formats</p>
+            <div class="upload-instructions">
+                <p style="margin-bottom: 0.5rem; text-align: center;">Upload meal photos for instant analysis</p>
+                <p style="margin: 0; text-align: center;">Supports JPG, JPEG, and PNG formats</p>
             </div>
         """, unsafe_allow_html=True)
-        
+
         uploaded_files = st.sidebar.file_uploader(
-            "Upload",
+            "",
             type=["jpg", "jpeg", "png"],
             accept_multiple_files=True,
             label_visibility="collapsed"
@@ -641,21 +598,11 @@ def main():
         portion_sizes = []
         for i, file in enumerate(uploaded_files):
             image_name = file.name
-            class_name = (
-                st.session_state.predicted_classes[i]
-                if i < len(st.session_state.predicted_classes)
-                else f"image_{i+1}"
-            )
-
-            import re
-            is_food101_image = re.match(r'^\d+\.(jpg|jpeg|png)$', image_name)
-            
-            directory = class_name if is_food101_image and i < len(st.session_state.predicted_classes) else "Downloads"
-            label = (
-                f"Portion size (g) for {directory}/{image_name}"
-                if i < len(st.session_state.predicted_classes)
-                else f"Portion size (g) for image {i+1}"
-            )
+            if i < len(st.session_state.predicted_classes):
+                class_name = st.session_state.predicted_classes[i]
+                label = f"Portion size (g) for {class_name}/{image_name}"
+            else:
+                label = f"Portion size (g) for image {i+1}"
             
             if f"portion_{i}" not in st.session_state.portion_sizes:
                 st.session_state.portion_sizes[f"portion_{i}"] = 100
@@ -669,15 +616,15 @@ def main():
             )
             portion_sizes.append(portion_size)
 
-        submit_button = st.sidebar.button("Analyze Image(s)")
+        submit_button = st.sidebar.button("Analyze Image(s)", 
+                                       key="analyze_button",
+                                       use_container_width=True)
 
         st.markdown('<h3 style="margin-top:0;">Analysis Results</h3>', unsafe_allow_html=True)
         if submit_button and uploaded_files:
-            if rf_model is None:
-                st.warning("Random Forest model is not loaded. Impact assessments will use rule-based logic only.")
             with st.spinner("Analyzing images..."):
                 images = [Image.open(file) for file in uploaded_files]
-                results, combined_recommendation = predict_and_recommend(df_avg, rf_model, images, portion_sizes, food_model, class_names, uploaded_files)
+                results, combined_recommendation = predict_and_recommend(df_avg, images, portion_sizes, food_model, class_names, uploaded_files)
                 
                 if combined_recommendation:
                     st.markdown('<hr style="border:2px solid #e74c3c; margin: 32px 0;">', unsafe_allow_html=True)

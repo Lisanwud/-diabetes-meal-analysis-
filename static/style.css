@@ -98,7 +98,7 @@ body {
 }
 
 .logo-icon:hover {
-    transform: rotate(10deg) scale(1.1);
+    transform: rotate словно(10deg) scale(1.1);
     box-shadow: 0 6px 14px rgba(255, 64, 129, 0.4);
 }
 
@@ -248,7 +248,7 @@ div[data-testid="stExpander"] > div {
     border-radius: var(--border-radius-md);
     margin-bottom: 1rem;
     overflow: hidden;
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: var(--transition);
 }
 
 div[data-testid="stExpander"] > div:hover {
@@ -386,6 +386,9 @@ div[data-testid="stFileUploader"] button[data-testid="baseButton-secondary"] {
     font-size: 1rem;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
+    width: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
 }
 
 div[data-testid="stFileUploader"] button[data-testid="baseButton-secondary"]:hover {
@@ -394,23 +397,120 @@ div[data-testid="stFileUploader"] button[data-testid="baseButton-secondary"]:hov
     box-shadow: var(--shadow-md);
 }
 
-div[data-testid="stFileUploader"] button[data-testid="baseButton-secondary"]::before {
-    content: "📁 ";
+/* Preview image styling */
+.preview-image {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-st.sidebar.markdown("""
-    <div class="upload-image-div">
-        <h3 style="color: var(--text-light); text-align: center;">Upload</h3>
-    </div>
-    <div class="upload-instructions" style="margin-bottom: 1rem; color: #e3f2fd; font-size: 1.05rem; text-align: center;">
-        <p>Upload your meal photo(s) for instant diabetes-friendly analysis.</p>
-        <p>You can select multiple images at once.</p>
-    </div>
-""", unsafe_allow_html=True)
+.preview-image:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    border-color: var(--primary-light);
+}
 
-uploaded_files = st.sidebar.file_uploader(
-    "Upload",
-    type=["jpg", "jpeg", "png"],
-    accept_multiple_files=True,
-    label_visibility="collapsed"
-)
+/* Image overlay and enlargement */
+.image-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-overlay.active {
+    display: flex;
+}
+
+.enlarged-image {
+    max-width: 90%;
+    max-height: 90%;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.9);
+}
+
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+    background: rgba(0,0,0,0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Custom upload button styling */
+.stFileUploader > div > button {
+    width: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+    background-color: #4285F4 !important;
+    color: white !important;
+    border-radius: 24px !important;
+    padding: 0.5rem 2rem !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+/* Hide default "Drag and drop files here" text */
+.stFileUploader label[data-testid="stFileUploaderDropzoneLabel"] {
+    display: none !important;
+}
+
+/* Style upload instructions */
+.upload-instructions {
+    background-color: rgba(66, 133, 244, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(66, 133, 244, 0.3);
+}
+
+.upload-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #E3F2FD;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Custom file uploader styling */
+.css-9ycgxx, .css-demzbm {
+    display: none !important;
+}
+
+.css-1mqknba button, .css-1x8cf1d {
+    width: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+    background-color: #4285F4 !important;
+    color: white !important;
+    border-radius: 24px !important;
+    padding: 0.5rem 2rem !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+.css-1mqknba button::before,
+div[data-testid="stFileUploader"] button::before {
+    content: "" !important;
+}

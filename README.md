@@ -3,54 +3,81 @@
 ## 🔍 Introduction
 
 ### Background
-DiabEats represents a significant and growing global health challenge. According to the International Diabetes Federation, over 537 million adults had diabetes in 2021, and this number is projected to rise dramatically to 783 million by 2045. This underscores the urgent need for accessible tools like DiabEats that can empower individuals to take control of their diabetes through better food choices.
+DiabEats addresses a significant and growing global health challenge. According to the International Diabetes Federation, over 537 million adults had diabetes in 2021, and this number is projected to rise to 783 million by 2045. This underscores the urgent need for accessible tools like DiabEats that empower individuals to manage their diabetes through informed food choices.
+
+#### Diabetes Statistics in the United States
+The number of adults (20–79 years) with diabetes in the United States has been steadily increasing:
+
+| **Year** | **Diabetes Population (Millions)** |
+|----------|------------------------------------|
+| 2000     | 15.3                               |
+| 2011     | 23.7                               |
+| 2024     | 38.5                               |
+| 2050     | 43.0 (projected)                   |
+
+The USA, part of the IDF North America and Caribbean Region, ranks third globally for the number of adults with diabetes (20-79 years) and holds the highest total diabetes-related health expenditure.
 
 ### Problem
-With this growing health crisis in mind, DiabEats focuses on a key question: **Can we develop diabetes-friendly dietary recommendations for users based solely on a picture of their meal?** This approach aims to make nutritional guidance more accessible and practical for daily use.
+DiabEats focuses on a key question: **Can we provide diabetes-friendly dietary recommendations for U.S. diabetic and prediabetic users using just a photo of their meal?** This approach aims to make nutritional guidance accessible and practical for daily use.
 
 ### Target Audience
-DiabEats specifically targets individuals in the US with diabetes or prediabetes who need ongoing support in making appropriate dietary choices to manage their condition.
+DiabEats targets individuals in the US with diabetes or prediabetes who need ongoing support in making appropriate dietary choices to manage their condition.
 
 ## 📊 Overview
 
-DiabEats is a machine learning system designed to help individuals with diabetes and prediabetes make informed dietary choices by analyzing meal photos. The system follows a streamlined process: users upload an image of their meal through the interface, which is then classified into one of 101 food classes using EfficientNetV2. Comprehensive nutrient data is retrieved for the identified food, and the system evaluates its impact on blood sugar for diabetes management. Results are presented in an intuitive display with nutritional information, diabetes-relevant insights, and actionable recommendations. This process transforms a simple food image into actionable health insights in seconds, empowering users to manage their diabetes effectively.
+DiabEats is a machine learning system designed to help individuals with diabetes and prediabetes make informed dietary choices by analyzing meal photos. The system follows a streamlined process: users upload an image of their meal through the interface, which is classified into one of 101 food classes using EfficientNetV2. Comprehensive nutrient data is retrieved for the identified food, and a rule-based assessment evaluates its impact on blood sugar for diabetes management, grounded in American Diabetes Association guidelines. Results are presented in an intuitive display with nutritional information, diabetes-relevant insights, and actionable recommendations. This process transforms a food image into actionable health insights in seconds, empowering users to manage their diabetes effectively.
 
-The system leverages transfer learning with a pre-trained EfficientNetV2B3 model, fine-tuned on the Food-101 dataset, achieving a top-1 accuracy of 80.5% and top-5 accuracy of 94.6%. A RandomForestClassifier, trained on nutritional features, classifies foods into Low, Moderate, or High impact categories for diabetes management with 90% accuracy. Nutritional data, sourced from Edamam API and USDA FoodData Central, is normalized to per 100g to inform impact scores grounded in American Diabetes Association guidelines. Recommendations suggest safe portion sizes or alternatives based on impact levels, presented in structured Markdown tables for clarity.
+The system leverages transfer learning with a pre-trained EfficientNetV2B3 model, fine-tuned on the Food-101 dataset, achieving a top-1 accuracy of 80.5% and top-5 accuracy of 94.6%. Nutritional data, sourced from Edamam API and USDA FoodData Central, is normalized to per 100g to inform impact scores. Recommendations suggest safe portion sizes or alternatives based on impact levels, presented in structured Markdown tables for clarity.
 
 ## 🚀 Features
 
 - **Food Image Recognition**: Upload food images for analysis using a deep learning model (EfficientNetV2).
 - **Nutritional Analysis**: Retrieve detailed nutritional information for identified foods.
-- **Diabetes Impact Assessment**: Get personalized impact assessment based on the food's nutritional profile.
+- **Diabetes Impact Assessment**: Get personalized impact assessment using a rule-based approach based on nutritional profiles.
 - **Smart Recommendations**: Receive tailored dietary recommendations based on impact level.
 - **Interactive Dashboard**: User-friendly interface with visualizations and detailed analytics.
 - **Multi-food Analysis**: Analyze multiple food items simultaneously with portion size adjustments.
 
 ## 🔧 Technical Architecture
 
-The system follows a comprehensive workflow as illustrated in the application flow diagram below. The architecture consists of several key components:
-![Landing Page](images/application_flow.png)
+# Diabetes Meal Analysis System Architecture
 
-1. **Data Preparation Pipeline**:
-   - The Food-101 Dataset serves as the foundation for image training data.
-   - Images undergo preprocessing to standardize dimensions and enhance features.
-   - The Nutrition API interfaces with external sources to build a comprehensive nutritional database.
+The system is proposed to follow a workflow as illustrated in the diagram below. The architecture consists of several key components:
 
-2. **Dual Model Architecture**:
-   - **EfficientNetV2**: Handles food recognition from images with high accuracy.
-   - **Random Forest Classifier**: Processes nutritional features to determine diabetes impact levels.
+![Proposed Flow Diagram](images/proposed_flow.png)
 
-3. **Integration Layers**:
-   - Food Recognition Model connects image analysis with the nutrition database.
-   - Impact Classification module combines nutritional data with the Random Forest model.
+1. **Upload Meal Image**:
+   - User Interface provides an intuitive platform for meal image uploads
+   - Image Processing module handles standardization of uploaded images
+   - The system accepts various image formats and qualities to maximize accessibility
 
-4. **User-Facing Components**:
-   - Impact Assessment engine processes model outputs into meaningful impact categories.
-   - Recommendation engine generates personalized dietary advice.
-   - User Interface renders results and facilitates image uploads.
-   - Image Processing module handles user uploads and preprocessing.
+2. **Identify the Meal Image**:
+   - **EfficientNetV2** model analyzes the image with high accuracy
+   - The Food-101 Dataset forms the foundation for the image recognition training
+   - Advanced image preprocessing enhances features for better recognition
+
+3. **Retrieve Nutrition Data**:
+   - Food Recognition Model connects image analysis results to the nutrition database
+   - Nutrition API interfaces with external sources for comprehensive nutritional information
+   - The system extracts detailed macro and micronutrient profiles for identified foods
+
+4. **Evaluate Diabetes Impact**:
+   - Rule-Based Assessment evaluates nutritional features for diabetes impact
+   - Impact Classification module combines nutritional data with glycemic responses
+   - The system considers carbohydrate content, glycemic index, and portion sizes
+
+5. **Offer Diet Recommendations**:
+   - Recommendation engine generates personalized dietary advice
+   - Alternative food suggestions are provided based on nutritional profiles
+   - Portion adjustments are calculated to optimize blood sugar management
+
+6. **Display Analysis Results**:
+   - Impact Assessment engine processes outputs into meaningful impact categories
+   - User Interface renders comprehensive results with visual aids
+   - The system provides educational content about nutritional choices
 
 This architecture enables seamless flow from image input to personalized dietary recommendations, with each component optimized for its specific function while maintaining efficient integration with other modules.
+
 
 ## 📂 Project Structure
 
@@ -75,14 +102,11 @@ DiabEats/
 ├── models/
 │   ├── food_classes.json
 │   ├── food_recognition_model.keras
-│   └── rf_model.pkl
 ├── static/
 │   └── style.css
 ├── images/
 │   ├── app_landing_page.png
-│   ├── confusion_matrix.png
 │   ├── data_batch_preview.png
-│   ├── feature_importance.png
 │   ├── risk_level_distribution.png
 │   └── training_history.png
 ├── app.py
@@ -100,7 +124,7 @@ The `app.py` file powers a Streamlit web application that seamlessly integrates 
 ### Key Features of the Streamlit Application
 
 - **Image Upload Interface**: A sidebar file uploader allows users to upload single or multiple food images (JPEG or PNG) and set custom portion sizes for each item.
-- **Real-Time Analysis**: Upon clicking "Analyze Image(s)," the app identifies foods using EfficientNetV2, retrieves nutritional data, and applies the Random Forest model to classify diabetes impact levels (Low, Moderate, High).
+- **Real-Time Analysis**: Upon clicking "Analyze Image(s)," the app identifies foods using EfficientNetV2, retrieves nutritional data, and applies the rule-based assessment to classify diabetes impact levels (Low, Moderate, High).
 - **Comprehensive Results Display**: Results include top 5 predictions with confidence levels, detailed nutritional breakdowns, impact assessments, and combined analysis for multiple foods, presented in structured Markdown tables.
 - **Interactive Visualizations**: Bar plots show prediction probabilities, and tables provide nutritional insights, all styled for clarity and accessibility.
 - **Multi-Food Support**: For multiple images, results are separated with colored dividers, enhancing readability.
@@ -118,7 +142,7 @@ This comprehensive approach empowers individuals with diabetes to make informed 
 
 ### Food-101 Nutrition Database
 
-This data dictionary refers to [food101_nutrition_database.csv](./data/food101_nutrition_database.csv), which can be found in the [data](./data/) folder of this repository.  
+This data dictionary refers to [food101_nutrition_database.csv](./data/food101_nutrition_database.csv), which can be found in the [data](./data/) folder of this repository.
 
 | Column | Description | Data Type | Example |
 |--------|-------------|-----------|---------|
@@ -157,17 +181,13 @@ This notebook downloads the Food-101 dataset from ETH Zurich and organizes it fo
 This notebook processes the Food-101 dataset, organizing it into train, validation, and test directories for training the food recognition model.
 
 ### [02_food101_nutrition_database.ipynb](./code/02_food101_nutrition_database.ipynb)
-This notebook extracts nutritional information for the food categories in the Food-101 dataset using the Edamam Food Database API, and performs a basic assessment of their suitability for individuals with diabetes. The results are saved to a CSV file.
+This notebook extracts nutritional information for the food categories in the Food-101 dataset using the Edamam Food Database API and performs a basic assessment of their suitability for individuals with diabetes. The results are saved to a CSV file.
 
 ### [03_food_recognition.ipynb](./code/03_food_recognition.ipynb)
 This notebook trains a food recognition model using EfficientNetV2B3 on the Food-101 dataset, with enhanced data augmentation, mixed precision training, and progressive fine-tuning for the DiabEats project.
 
 ### [04_diabetes_management_classification.ipynb](./code/04_diabetes_management_classification.ipynb)
-This notebook develops a Random Forest model to classify foods as Low, Moderate, or High impact on glycemic control for diabetes management based on their nutritional profiles. The system supports both single and multiple food items, integrates image-based food recognition, and provides structured dietary recommendations in Markdown tables. The model is trained on a nutritional dataset, evaluated using accuracy, and mimics advanced meal analysis output formats.
-
-**Why Random Forest?** Random Forest is robust to overfitting, handles small datasets, and provides interpretable feature importance.
-
-**Why Accuracy?** Accuracy measures the proportion of correct classifications, ensuring reliable identification of foods that impact blood sugar in health-sensitive applications.
+This notebook develops a rule-based system to classify foods as Low, Moderate, or High impact on glycemic control for diabetes management based on their nutritional profiles. The system supports both single and multiple food items, integrates image-based food recognition, and provides structured dietary recommendations in Markdown tables. The assessment is grounded in clinical guidelines and applied to a nutritional dataset, mimicking advanced meal analysis output formats.
 
 ## 📊 Model Performance
 
@@ -192,43 +212,6 @@ The EfficientNetV2B3 model was fine-tuned on the Food-101 dataset to achieve hig
 
 The model demonstrates strong performance, with a validation top-1 accuracy of 80.5% and top-5 accuracy of 94.6%, making it highly effective for food recognition tasks. The high AUC value (0.984) indicates excellent discrimination capability between food classes.
 
-### Random Forest Classification Performance
-
-The Random Forest classifier was trained to determine diabetes impact levels based on nutritional features extracted from identified foods. The model demonstrates strong performance across all impact categories, achieving an accuracy of 0.90.
-
-#### Classification Report
-
-| Classification Metrics | precision | recall | f1-score | support |
-|------------------------|-----------|--------|----------|---------|
-| **High** | 1.00 | 1.00 | 1.00 | 4 |
-| **Low** | 0.80 | 1.00 | 0.89 | 8 |
-| **Moderate** | 1.00 | 0.78 | 0.88 | 9 |
-| **accuracy** | 0.90 | 0.90 | 0.90 | 21 |
-| **macro avg** | 0.93 | 0.93 | 0.92 | 21 |
-| **weighted avg** | 0.92 | 0.90 | 0.90 | 21 |
-
-#### Confusion Matrix
-
-![Confusion Matrix](images/confusion_matrix.png)
-
-The confusion matrix shows strong performance of the model, with most foods being correctly classified into their respective impact categories. The model achieves perfect precision and recall for the High impact category and strong performance for Low and Moderate categories, which is critical for diabetes management applications.
-
-### Feature Importance Analysis
-
-![Feature Importance](images/feature_importance.png)
-
-| Feature | Importance |
-|---------|------------|
-| carbohydrates | 0.337730 |
-| sugars | 0.318621 |
-| protein | 0.097949 |
-| calories | 0.080799 |
-| fiber | 0.070132 |
-| fats | 0.067594 |
-| sodium | 0.027174 |
-
-The feature importance analysis confirms that carbohydrates and sugars are the most influential factors in determining diabetes impact, accounting for over 65% of the model's decision-making process. This aligns with medical understanding of diabetes management, where carbohydrate and sugar intake are primary concerns.
-
 ### Training History
 
 ![Training History](images/training_history.png)
@@ -240,7 +223,7 @@ The training history graph illustrates the model's learning progression over epo
 The application uses a two-stage approach for impact assessment:
 
 1. **Image Classification**: EfficientNetV2 model to identify food class.
-2. **Impact Analysis**: Random Forest classifier to determine diabetes impact level based on nutritional profile.
+2. **Impact Analysis**: Rule-based assessment to determine diabetes impact level based on nutritional profile, aligned with clinical guidelines.
 
 Impact levels are categorized as:
 - **Low**: Safe for regular consumption.
@@ -277,17 +260,20 @@ streamlit run app.py
 
 ### Conclusions
 
-1. Combining computer vision and machine learning effectively identifies foods and assesses their diabetes impact with high reliability. The 94.6% top-5 accuracy ensures dependable food recognition in most scenarios.
-2. Carbohydrates and sugars were confirmed as the most significant factors in diabetes impact, validating the model's approach.
-3. The system successfully met the target metrics—80.5% food recognition and 90% impact classification accuracy.
-4. The analysis revealed that many common foods fall into Moderate to High impact categories, underscoring the importance of this tool for individuals managing diabetes.
+1. The food recognition model, powered by EfficientNetV2, achieves a high top-5 accuracy of 94.6%, ensuring reliable food identification even in cases where the top-1 prediction may not be correct.
+2. The rule-based diabetes impact assessment identifies carbohydrates and sugars as key factors influencing blood glucose levels, aligning with nutritional guidelines and providing actionable insights for diabetes management.
+3. The system successfully meets its objectives, with the food recognition model achieving 80.5% top-1 accuracy and the rule-based assessment delivering consistent, evidence-based classifications for Low, Moderate, and High diabetes impact categories.
+4. The Streamlit-based user interface provides an intuitive and interactive experience, enabling users to easily upload meal photos, view nutritional breakdowns, and access personalized recommendations.
+5. The integration of portion size adjustments in the diabetes impact assessment enhances personalization, allowing the system to reflect real-world eating habits accurately.
 
 ### Next Steps
 
-1. Expand Nutritional Database: Include more regional and ethnic food varieties beyond the current 101 categories to improve versatility.
-2. Improve Random Forest: Enhance accuracy for Moderate impact classifications (currently 87%) to match Low (92%) and High (93%).
-3. Optimize EfficientNetV2B3: Improve top-1 accuracy (80.5%) through advanced augmentation or further fine-tuning.
-4. User Feedback Mechanism: Implement a system for users to correct misclassifications, enabling continuous improvement.
+1. Expand the nutritional database beyond the current 101 food categories to include a broader range of regional and ethnic food varieties, enhancing the system’s applicability to diverse diets.
+2. Refine the rule-based diabetes impact assessment by incorporating additional nutritional factors (e.g., glycemic index).
+3. Optimize the EfficientNetV2B3 model to increase top-1 accuracy beyond 80.5%, potentially through advanced data augmentation techniques or further fine-tuning.
+4. Implement a user feedback mechanism to allow users to correct misclassifications, improving the system’s accuracy and personalization over time.
+5. Enhance the user interface with features like downloadable reports or meal tracking history to support long-term diabetes management and user engagement.
+6. Integrate real-time nutritional data APIs (e.g., Edamam or USDA FoodData Central) to provide more accurate and up-to-date nutritional profiles for identified foods.
 
 ## 📜 License
 
@@ -309,15 +295,19 @@ For questions or feedback, please reach out to [kibur.lisanu@gmail.com](mailto:k
 
 ## 📚 References 
 
-1. [Mermaid](https://www.mermaidchart.com/)
-2. [The Food-101 Data Set](http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz)
-3. [FoodData Central](https://fdc.nal.usda.gov/api-key-signup)
-4. [Edamam Food Database](https://api.edamam.com/api/food-database/v2/parser)
-5. [Global Diabetes Trends and Burden (PMC10591058)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10591058/)
-6. [AI-Based Diabetes Risk Classification System (IRJMETS)](https://www.irjmets.com/uploadedfiles/paper/issue_6_june_2022/26348/final/fin_irjmets1655889335.pdf)
-7. [Machine Learning for Diabetes Risk Assessment (Frontiers in Applied Mathematics and Statistics)](https://www.frontiersin.org/journals/applied-mathematics-and-statistics/articles/10.3389/fams.2025.1490104/abstract)
-8. [Self-Reported Dietary Assessment Limitations (JAMA Internal Medicine)](https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2757497)
-9. [Automated Food Image Analysis for Health (PLOS Digital Health)](https://journals.plos.org/digitalhealth/article?id=10.1371%2Fjournal.pdig.0000530)
-10. [Food Image Recognition Using Deep Learning (Nature Scientific Reports)](https://www.nature.com/articles/s41598-021-95341-8)
-11. [AI in Diabetes Risk Prediction (npj Digital Medicine)](https://www.nature.com/articles/s41746-023-00933-5)
-12. [Rule-Based Recommendation Systems for Diabetes (SAGE Open Medicine)](https://journals.sagepub.com/doi/10.1177/23333928241275292?icid=int.sj-full-text.similar-articles.3)
+1. [Senior woman with medical problems](https://www.freepik.com/free-photo/senior-woman-with-medical-problems_7794978.htm/?utm_source=slidesgo_template&utm_medium=referral-link&utm_campaign=sg_resources&utm_content=freepik)
+2. [Smiley covid recovery center female doctor checking elder patient's blood pressure](https://www.freepik.com/free-photo/smiley-covid-recovery-center-female-doctor-checking-elder-patient-s-blood-pressure_12367946.htm/?utm_source=slidesgo_template&utm_medium=referral-link&utm_campaign=sg_resources&utm_content=freepik)
+3. [Doctor using tensiometer high angle](https://www.freepik.com/free-photo/doctor-using-tensiometer-high-angle_34728752.htm/?utm_source=slidesgo_template&utm_medium=referral-link&utm_campaign=sg_resources&utm_content=freepik)
+4. [International Diabetes Federation](https://diabetesatlas.org/data-by-location/country/united-states-of-america/)
+5. [Mermaid](https://www.mermaidchart.com/)
+6. [The Food-101 Data Set](http://data.vision.ee.ethz.ch/cvl/food-101.tar.gz)
+7. [FoodData Central](https://fdc.nal.usda.gov/api-key-signup)
+8. [Edamam Food Database](https://api.edamam.com/api/food-database/v2/parser)
+9. [Global Diabetes Trends and Burden (PMC10591058)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10591058/)
+10. [AI-Based Diabetes Risk Classification System (IRJMETS)](https://www.irjmets.com/uploadedfiles/paper/issue_6_june_2022/26348/final/fin_irjmets1655889335.pdf)
+11. [Machine Learning for Diabetes Risk Assessment (Frontiers in Applied Mathematics and Statistics)](https://www.frontiersin.org/journals/applied-mathematics-and-statistics/articles/10.3389/fams.2025.1490104/abstract)
+12. [Self-Reported Dietary Assessment Limitations (JAMA Internal Medicine)](https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2757497)
+13. [Automated Food Image Analysis for Health (PLOS Digital Health)](https://journals.plos.org/digitalhealth/article?id=10.1371%2Fjournal.pdig.0000530)
+14. [Food Image Recognition Using Deep Learning (Nature Scientific Reports)](https://www.nature.com/articles/s41598-021-95341-8)
+15. [AI in Diabetes Risk Prediction (npj Digital Medicine)](https://www.nature.com/articles/s41746-023-00933-5)
+16. [Rule-Based Recommendation Systems for Diabetes (SAGE Open Medicine)](https://journals.sagepub.com/doi/10.1177/23333928241275292?icid=int.sj-full-text.similar-articles.3)
